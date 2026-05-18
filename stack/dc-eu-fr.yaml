@@ -1,7 +1,7 @@
 apiVersion: platform.huybrechts.xyz/v1
 kind: provider
 meta:
-  name: dc_eu_fr
+  name: kamatera_eu_fr
   annotations:
     description: Kamatera cloud provider — Europe Frankfurt datacenter
   labels:

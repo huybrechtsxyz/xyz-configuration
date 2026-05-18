@@ -16,7 +16,7 @@ spec:
     - name: haven_iac
       provisioner: terraform
       source:
-        repository: haven_config
+        repository: haven
         source_path: terraform
 
   topology:

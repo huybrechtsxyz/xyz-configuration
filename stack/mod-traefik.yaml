@@ -9,7 +9,7 @@ meta:
   tags: [haven, traefik]
 spec:
   source:
-    repository: haven_config
+    repository: haven
     source_path: services/traefik
   properties:
     mounts:
