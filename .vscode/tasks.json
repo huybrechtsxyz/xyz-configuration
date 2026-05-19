@@ -2,9 +2,9 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "xyz: validate",
+      "label": "strata: validate",
       "type": "shell",
-      "command": "xyz validate --file ${input:configFile}",
+      "command": "strata validate --file ${input:configFile}",
       "group": "build",
       "presentation": {
         "echo": true,
@@ -16,9 +16,9 @@
       "problemMatcher": []
     },
     {
-      "label": "xyz: deploy run",
+      "label": "strata: deploy run",
       "type": "shell",
-      "command": "xyz deploy run --file ${input:configFile}",
+      "command": "strata deploy run --file ${input:configFile}",
       "group": "build",
       "presentation": {
         "echo": true,
@@ -30,9 +30,9 @@
       "problemMatcher": []
     },
     {
-      "label": "xyz: build run",
+      "label": "strata: build run",
       "type": "shell",
-      "command": "xyz build run --file ${input:configFile}",
+      "command": "strata build run --file ${input:configFile}",
       "group": "build",
       "presentation": {
         "echo": true,
@@ -46,7 +46,7 @@
     {
       "label": "Run: haven",
       "type": "shell",
-      "command": "xyz ${input:cliArgs}",
+      "command": "strata ${input:cliArgs}",
       "group": "build",
       "presentation": {
         "echo": true,
