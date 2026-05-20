@@ -1,12 +1,12 @@
 # Workspace README
 
-This `.platform` folder contains workspace state and helper files created by the XYZ Platform CLI.
+This `.strata` folder contains workspace state and helper files created by the Strata CLI.
 
 Included files:
 
 - `logging.yaml` — development logging configuration for local runs
 - `cli.yaml` — CLI preference values for the workspace
-- `.gitignore` — files to ignore from the `.platform` folder
+- `.gitignore` — files to ignore from the `.strata` folder
 - `integrations/` — per-integration help documents (one markdown file per integration)
 
 ## Using the integration docs

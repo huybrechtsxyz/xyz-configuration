@@ -1,10 +1,10 @@
 """
-Custom integration template for XYZ Platform.
+Custom integration template for Strata.
 
-Copy / rename this file, implement the class, then register the type so xyz
+Copy / rename this file, implement the class, then register the type so strata
 can load it via the YAML ``type:`` field in your configuration files.
 
-Drop-in location: .platform/integrations/<your_name>.py
+Drop-in location: .strata/integrations/<your_name>.py
 The platform auto-discovers and loads all .py files in that directory at
 startup, so no changes to core code are required.
 
@@ -19,7 +19,7 @@ Minimal checklist
 
 How it works
 ------------
-Auto-discovery: At startup the platform scans ``.platform/integrations/`` and
+Auto-discovery: At startup the platform scans ``.strata/integrations/`` and
 imports every ``.py`` file it finds.  Each file's ``register()`` function is
 called, which inserts the type→class mapping into ``IntegrationFactory``.
 Afterwards, any YAML entry whose ``type:`` matches the registered string will
@@ -34,7 +34,7 @@ same object.  Override ``_get_instance_key_static()`` to key on something
 else (e.g. endpoint URL) if your integration needs multiple simultaneous
 connections.
 
-Capability protocols (optional, from xyz_platform.integrations.capabilities)
+Capability protocols (optional, from strata.integrations.capabilities)
 -----------------------------------------------------------------------------
 Declare CAPABILITIES to signal what your integration can do:
   IRepositoryTool      - git-style clone/fetch/push
@@ -55,11 +55,11 @@ from __future__ import annotations
 
 from typing import Any, Dict, List, Optional, Tuple
 
-from xyz_platform.integrations.base_integration import BaseIntegration
-from xyz_platform.integrations.factory import IntegrationFactory
+from strata.integrations.base_integration import BaseIntegration
+from strata.integrations.factory import IntegrationFactory
 
-# from xyz_platform.integrations.capabilities import ISecretStore  # uncomment if needed
-from xyz_platform.models.integration_model import IntegrationModel
+# from strata.integrations.capabilities import ISecretStore  # uncomment if needed
+from strata.models.integration_model import IntegrationModel
 
 
 class MyIntegration(BaseIntegration):
@@ -83,7 +83,9 @@ class MyIntegration(BaseIntegration):
         singleton per named entry in your solution.  Override only if you
         need to key on something else (e.g. endpoint URL).
         """
-        config: Optional[IntegrationModel] = kwargs.get("config") or (args[0] if args else None)
+        config: Optional[IntegrationModel] = kwargs.get("config") or (
+            args[0] if args else None
+        )
         return config.name if config else "default"
 
     # ------------------------------------------------------------------ #
@@ -132,11 +134,11 @@ class MyIntegration(BaseIntegration):
         return True, ""
 
     # ------------------------------------------------------------------ #
-    # Setup metadata (used by `xyz tools install` and `xyz tools check`)  #
+    # Setup metadata (used by `strata tools install` and `strata tools check`)  #
     # ------------------------------------------------------------------ #
 
     def get_setup_info(self) -> Dict[str, Any]:
-        """Return metadata used by `xyz tools install` and `xyz tools check`."""
+        """Return metadata used by `strata tools install` and `strata tools check`."""
         return {
             "name": "my_integration",
             "command": self.COMMAND,
@@ -156,10 +158,12 @@ class MyIntegration(BaseIntegration):
             "auth_methods": [
                 {
                     "method": "Environment variable",
-                    "description": "Set MY_TOOL_API_TOKEN before running xyz.",
+                    "description": "Set MY_TOOL_API_TOKEN before running strata.",
                 },
             ],
-            "yaml_example": ("type: my_integration\nspec:\n  endpoint: https://my-service.example.com\n"),
+            "yaml_example": (
+                "type: my_integration\nspec:\n  endpoint: https://my-service.example.com\n"
+            ),
         }
 
     # ------------------------------------------------------------------ #

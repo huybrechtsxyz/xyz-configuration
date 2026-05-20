@@ -2,7 +2,7 @@
 # Workflow Name : Deploy - Platform
 # File Name     : deploy-platform.yml
 # Description   :
-#   Deploys the Haven platform workspace using xyz-platform CLI.
+#   Deploys the Haven platform workspace using strata CLI.
 #   Builds artifacts then runs Terraform init/validate/plan/apply.
 #
 # Author        : Vincent Huybrechts
@@ -42,8 +42,8 @@ permissions:
   contents: read
 
 env:
-  XYZ_OUTPUT: json
-  XYZ_WORK_PATH: ${{ github.workspace }}
+  STRATA_OUTPUT: json
+  STRATA_WORK_PATH: ${{ github.workspace }}
   DEPLOYMENT_FILE: "@haven/deploy/deploy-prd.yaml"
 
 jobs:
@@ -67,8 +67,8 @@ jobs:
         with:
           python-version: "3.13"
 
-      - name: Install xyz-platform
-        run: pip install xyz-platform
+      - name: Install strata
+        run: pip install xyz-strata
 
       - name: Install Terraform
         uses: hashicorp/setup-terraform@v3
@@ -121,14 +121,14 @@ jobs:
       # ------------------------------------------------------------------
       - name: Validate deployment file
         run: |
-          xyz-platform validate $DEPLOYMENT_FILE --deep
+          strata validate $DEPLOYMENT_FILE --deep
 
       # ------------------------------------------------------------------
       # Build
       # ------------------------------------------------------------------
       - name: Build platform artifacts
         run: |
-          xyz-platform build run --file $DEPLOYMENT_FILE
+          strata build run --file $DEPLOYMENT_FILE
 
       - name: Upload build output
         uses: actions/upload-artifact@v4
@@ -155,4 +155,4 @@ jobs:
           if [ -n "${{ inputs.stage }}" ]; then
             ARGS="$ARGS --stage ${{ inputs.stage }}"
           fi
-          xyz-platform deploy run $ARGS
+          strata deploy run $ARGS

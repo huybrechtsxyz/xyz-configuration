@@ -10,7 +10,7 @@ disable_existing_loggers: false
 
 formatters:
   json:
-    (): xyz_platform.logger.formatters.JsonFormatter
+    (): strata.logger.formatters.JsonFormatter
 
 handlers:
   file:
@@ -18,12 +18,12 @@ handlers:
     level: INFO
     formatter: json
     filename: /var/log/haven/application.json
-    maxBytes: 52428800  # 50MB
+    maxBytes: 52428800 # 50MB
     backupCount: 10
     encoding: utf8
 
 loggers:
-  xyz_platform:
+  strata:
     level: INFO
     handlers: [file]
     propagate: false
