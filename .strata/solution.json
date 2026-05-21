@@ -11,7 +11,14 @@
         "name": "prd",
         "active": true,
         "created": "2026-05-21T11:12:55.202631+00:00",
-        "configfile_paths": [],
+        "configfile_paths": [
+          {
+            "name": "config",
+            "path": ".\\config\\config.yaml",
+            "type": "configfile",
+            "created": "2026-05-21T13:08:37.486604+00:00"
+          }
+        ],
         "envfile_paths": [],
         "datafile_paths": [],
         "secretfile_paths": []

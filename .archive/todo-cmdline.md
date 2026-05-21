@@ -7,6 +7,28 @@
 **option**. This breaks muscle memory and contradicts the documented "Next steps"
 message printed by `strata sln init`.
 
+The same inconsistency runs deeper: some commands use **positional arguments**
+for their primary inputs while others use **named `--options`**, with no clear
+rule about which pattern to follow.
+
+## Positional argument vs --option split
+
+| Command                               | Pattern       | Notes                                 |
+| ------------------------------------- | ------------- | ------------------------------------- |
+| `strata validate <path>`              | positional    | should match `--file` like all others |
+| `strata ref config add <name> <path>` | 2 positionals | `--name` / `--path` would be clearer  |
+| `strata ref env add <name> <path>`    | 2 positionals | same                                  |
+| `strata repo add <name> <url>`        | 2 positionals | `--name` / `--url`                    |
+| `strata profile add <name>`           | positional    | `--name`                              |
+| `strata profile activate <name>`      | positional    | `--name`                              |
+| `strata config set <key> <value>`     | 2 positionals | `--key` / `--value`                   |
+| `strata schema <kind>`                | positional    | `--kind`                              |
+| `strata tools check <name>`           | positional    | `--name`                              |
+| `strata sln export --name <name>`     | `--option` ✅  | inconsistent with the above           |
+| `strata new --path <path>`            | `--option` ✅  | inconsistent with the above           |
+| `strata deploy run --file <path>`     | `--option` ✅  | —                                     |
+| `strata build run --file <path>`      | `--option` ✅  | —                                     |
+
 ## Affected commands
 
 | Command              | Current interface        | Expected        |
@@ -58,6 +80,29 @@ not `--file`. This will confuse new users on first run.
 > `--file` but the current code rejects it.
 >
 > Backwards-incompatible change — bump minor version.
+
+## Error messages reference wrong subcommand name
+
+`--deep` validation (and equivalent build/deploy checks) emit:
+
+```
+--deep requires at least one configfile path on the active profile.
+Add one with `strata ref configfile add` or remove --deep.
+```
+
+The correct command is `strata ref config add` — there is no `configfile` subcommand.
+This appears in three places:
+
+| File                                        | Line |
+| ------------------------------------------- | ---- |
+| `commands/validate/run_validate_command.py` | 228  |
+| `commands/builders/base_build_command.py`   | 145  |
+| `commands/deploy/base_deploy_command.py`    | 142  |
+
+**Also:** the help docs under `src/strata/data/help/` use `xyz ref configfile add`
+(wrong binary name `xyz` instead of `strata`, and wrong subcommand `configfile`).
+Affected files: `refs.md`, `quickstart.md`, `profiles.md`, `environments.md`,
+`cross-repo.md`.
 
 ## Notes
 
