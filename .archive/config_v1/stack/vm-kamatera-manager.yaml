@@ -1,22 +1,25 @@
-apiVersion: platform.huybrechts.xyz/v1
+apiVersion: strata.huybrechts.xyz/v1
 kind: resource
 meta:
-  name: haven_vm_hetzner_manager
+  name: haven_vm_kamatera_manager
   annotations:
-    description: Hetzner Virtual Machine for Haven Docker Swarm manager node
+    description: Kamatera Virtual Machine for Haven Docker Swarm manager node
   labels:
     version: 1.0.0
-  tags: [haven, hetzner, vm, manager]
+  tags: [haven, kamatera, vm, manager]
 spec:
   lifecycle: null
   properties:
-    provider_type: hetzner
+    provider_type: kamatera
     resource_type: virtualmachine
-    unit_cost: 4.35 # USD per month (cpx11)
+    unit_cost: 5.00 # USD per month
   configuration:
-    image: ubuntu-24.04
-    server_type: cpx11
-    location: nbg1
+    os_name: "Ubuntu"
+    os_code: "24.04 64bit"
+    cpu_type: "A"
+    cpu_cores: 1
+    ram_mb: 1024
+    billing: "hourly"
   storage:
     install_path: /opt/install/haven
     disks:
