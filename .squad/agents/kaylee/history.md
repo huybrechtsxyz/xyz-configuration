@@ -22,3 +22,24 @@
 - **Wave 1 status:** Domain transfers initiated 2026-05-27; Hetzner not yet provisioned
 
 ## Learnings
+
+### 2026-05-29 — Terraform root module for Hearth (Hetzner Cloud)
+
+Built `terraform/` with four files: `versions.tf`, `variables.tf`, `main.tf`, `outputs.tf`.
+
+**What it provisions:**
+- SSH key (from GitHub Secrets via TF_VAR_HETZNER_PUBLIC_KEY)
+- Private network (10.0.0.0/8) with /24 subnet in eu-central zone
+- Hearth VPS (CX22, ubuntu-24.04, nbg1) with prevent_destroy lifecycle
+- Firewall: default-deny in+out, allows HTTP/HTTPS in, SSH from private net only, DNS/NTP/apt/HTTPS out
+- Server-network attachment for private IP
+
+**Key decisions:**
+- Kept the strata auto.tfvars.json variable contract from v2 (`workspace_name`, `resources`, `firewalls`, etc.) but adapted `resources.configuration` from Kamatera shape (cpu_type/ram_mb/billing) to Hetzner shape (server_type/image/location)
+- Firewall rules are hardcoded in main.tf rather than dynamically generated from `var.firewalls` — keeps it readable for a 2-server platform; can be made dynamic when Forge joins
+- Loopback rules from fw-hetzner-hearth.yaml skipped — hcloud firewalls don't support interface-based rules (those are OS-level nftables)
+- No hcloud_volume resources — the 40GB CX22 root disk is sufficient; /opt/haven/* paths are directories, not block volumes
+- Storage Box (BX11) noted in outputs.tf as a placeholder — not provisionable via hcloud provider
+- Local state backend — no Terraform Cloud (that was Kamatera-era)
+- cloud-init creates /opt/haven directory tree on first boot
+- Port array [20, 21] mapped to port range "20-21" for hcloud compatibility

@@ -17,7 +17,7 @@ spec:
       provisioner: terraform
       source:
         repository: haven
-        source_path: terraform
+        source_path: deploy/terraform
 
   topology:
     - name: hetzner_hearth
