@@ -4,65 +4,82 @@
 
 ## Prerequisites
 
-| Tool | Version | Install |
-|------|---------|---------|
-| strata | v0.0.3+ | `uv tool install xyz-strata` or `pip install xyz-strata` |
-| OpenTofu / Terraform | >= 1.6 | [opentofu.org](https://opentofu.org/docs/intro/install/) or `choco install opentofu` |
-| Ansible | >= 2.14 | `pip install ansible-core` |
-| GitHub CLI | latest | `winget install GitHub.cli` |
+| Tool                 | Version | Install                                                                              |
+| -------------------- | ------- | ------------------------------------------------------------------------------------ |
+| strata               | v0.0.4+ | `uv tool install xyz-strata` or `pip install xyz-strata`                             |
+| OpenTofu / Terraform | >= 1.6  | [opentofu.org](https://opentofu.org/docs/intro/install/) or `choco install opentofu` |
+| Ansible              | >= 2.14 | `pip install ansible-core`                                                           |
+| GitHub CLI           | latest  | `winget install GitHub.cli`                                                          |
 
 ## Accounts Required
 
-| Service | What you need | Where |
-|---------|---------------|-------|
-| Hetzner Cloud | Project + API token (read/write) | [console.hetzner.cloud](https://console.hetzner.cloud) |
-| Terraform Cloud | Organization + workspace `haven-prd` | [app.terraform.io](https://app.terraform.io) |
-| GitHub | Repository secrets configured | Settings → Secrets → Actions |
-| INWX | Domain registrar (huybrechts.xyz) | [my.inwx.de](https://my.inwx.de) |
+| Service         | What you need                                               | Where                                                  |
+| --------------- | ----------------------------------------------------------- | ------------------------------------------------------ |
+| Hetzner Cloud   | Project `haven` + API token (read/write)                    | [console.hetzner.cloud](https://console.hetzner.cloud) |
+| Hetzner Robot   | Storage Box order (manual, no API)                          | [robot.hetzner.com](https://robot.hetzner.com)         |
+| Terraform Cloud | Organization `huybrechts-xyz`, workspace `haven_deploy_prd` | [app.terraform.io](https://app.terraform.io)           |
+| GitHub          | Repository secrets configured                               | Settings → Secrets → Actions                           |
+| INWX            | Domain registrar (huybrechts.xyz)                           | [my.inwx.de](https://my.inwx.de)                       |
 
 ## Step 1 — Generate SSH Key Pair
+
+**Option A — Bitwarden (recommended):**
+
+1. In Bitwarden: Add item → SSH Key → Generate ed25519 key
+2. Bitwarden's SSH agent will serve the key locally (no `~/.ssh/` file needed)
+3. Export the public and private key values for GitHub Secrets (Step 2)
+
+**Option B — Local key file:**
 
 ```bash
 ssh-keygen -t ed25519 -C "haven-deploy" -f ~/.ssh/haven_ed25519 -N ""
 ```
 
-Keep both files — the public key goes to Hetzner, the private key to GitHub Secrets.
+Either way, the public key goes to Hetzner and the private key to GitHub Secrets.
 
 ## Step 2 — Configure GitHub Secrets
 
 Go to your repo → Settings → Secrets and variables → Actions. Add:
 
-| Secret name | Value |
-|-------------|-------|
-| `TF_TOKEN_APP_TERRAFORM_IO` | Terraform Cloud API token |
-| `HETZNER_API_TOKEN` | Hetzner Cloud project API token |
-| `HETZNER_PUBLIC_KEY` | Contents of `~/.ssh/haven_ed25519.pub` |
-| `HETZNER_PRIVATE_KEY` | Contents of `~/.ssh/haven_ed25519` |
-| `HETZNER_ROOT_PASSWORD` | Strong random password (initial provisioning only) |
-| `INFISICAL_ESO_TOKEN` | Leave empty for Wave 1 (needed for Forge/k3s later) |
+| Secret name             | Value                                               |
+| ----------------------- | --------------------------------------------------- |
+| `TERRAFORM_API_TOKEN`   | Terraform Cloud API token                           |
+| `HETZNER_API_TOKEN`     | Hetzner Cloud project API token                     |
+| `HETZNER_PUBLIC_KEY`    | SSH public key (from Bitwarden or `.pub` file)      |
+| `HETZNER_PRIVATE_KEY`   | SSH private key (from Bitwarden or key file)        |
+| `HETZNER_ROOT_PASSWORD` | Strong random password (initial provisioning only)  |
+| `INFISICAL_ESO_TOKEN`   | Leave empty for Wave 1 (needed for Forge/k3s later) |
 
 ## Step 3 — Configure Terraform Cloud
 
-1. Create organization `huybrechts` (or use existing)
-2. Create workspace `haven-prd` (CLI-driven execution mode)
+1. Create organization `huybrechts-xyz`
+2. Create workspace `haven_deploy_prd` (must match deployment name in strata config)
 3. Set execution mode to **Local** (CLI drives the runs, TF Cloud stores state only)
-4. Generate a user/team API token → use as `TF_TOKEN_APP_TERRAFORM_IO`
+4. Generate a user/team API token → use as `TERRAFORM_API_TOKEN` GitHub Secret
 
-## Step 4 — Create Hetzner Project
+## Step 4 — Create Hetzner Cloud Project
 
 1. Log in to [Hetzner Cloud Console](https://console.hetzner.cloud)
-2. Create project: `huybrechts-family`
+2. Create project: `haven`
 3. Go to Security → API Tokens → Generate token (read/write) → use as `HETZNER_API_TOKEN`
 
 ## Step 5 — Order Storage Box (Manual)
 
-Storage Boxes are not provisioned via Terraform — order via Hetzner Robot:
+> **⚠️ This step is entirely manual.** Hetzner Storage Boxes are managed through
+> [Hetzner Robot](https://robot.hetzner.com), which has **no API, no CLI, and no
+> Terraform provider**. There is no way to automate this — it is a one-time
+> manual order through the web panel.
 
 1. Go to [robot.hetzner.com](https://robot.hetzner.com) → Storage Box
-2. Order BX11 (1 TB, ~€3.81/mo), location: Nuremberg
-3. Create sub-accounts: `hearth_backup`, `forge_backup`
-4. Enable SSH access on both sub-accounts
-5. Note the hostname (e.g., `uXXXXXX.your-storagebox.de`)
+2. Order **BX11** (1 TB, ~€3.81/mo), location: **Nuremberg**
+3. Once active, create sub-accounts:
+   - `hearth_backup` — BorgBackup target for Hearth VPS
+   - `forge_backup` — BorgBackup target for Forge VPS (Wave 2)
+4. Enable **SSH access** on both sub-accounts
+5. Note the hostname (e.g., `uXXXXXX.your-storagebox.de`) — needed for Ansible bootstrap
+
+The strata config file `config/hearth/sb-hetzner-hearth.yaml` documents the
+Storage Box specification for inventory purposes, but does **not** provision it.
 
 ## Step 6 — Local Deployment (First Time)
 
@@ -104,14 +121,14 @@ After apply, note the outputs:
 
 In INWX (or wherever DNS is managed), create A records:
 
-| Record | Value |
-|--------|-------|
-| `huybrechts.xyz` | `<hearth_public_ip>` |
-| `auth.huybrechts.xyz` | `<hearth_public_ip>` |
-| `vault.huybrechts.xyz` | `<hearth_public_ip>` |
-| `secrets.huybrechts.xyz` | `<hearth_public_ip>` |
-| `status.huybrechts.xyz` | `<hearth_public_ip>` |
-| `photos.huybrechts.xyz` | `<hearth_public_ip>` (proxied to Forge later) |
+| Record                   | Value                                         |
+| ------------------------ | --------------------------------------------- |
+| `huybrechts.xyz`         | `<hearth_public_ip>`                          |
+| `auth.huybrechts.xyz`    | `<hearth_public_ip>`                          |
+| `vault.huybrechts.xyz`   | `<hearth_public_ip>`                          |
+| `secrets.huybrechts.xyz` | `<hearth_public_ip>`                          |
+| `status.huybrechts.xyz`  | `<hearth_public_ip>`                          |
+| `photos.huybrechts.xyz`  | `<hearth_public_ip>` (proxied to Forge later) |
 
 TTL: 300 (5 min) initially, increase to 3600 after verification.
 
@@ -185,14 +202,14 @@ Once manual deployment works:
 
 ## Cost Summary
 
-| Resource | Monthly |
-|----------|---------|
-| Hearth CX22 | ~€4.15 |
-| Forge CPX41 (Wave 2) | ~€26.00 |
-| Storage Box BX11 | ~€3.81 |
-| Terraform Cloud | Free (< 500 resources) |
-| **Total Wave 1** | **~€7.96** |
-| **Total Wave 1+2** | **~€33.96** |
+| Resource             | Monthly                |
+| -------------------- | ---------------------- |
+| Hearth CX22          | ~€4.15                 |
+| Forge CPX41 (Wave 2) | ~€26.00                |
+| Storage Box BX11     | ~€3.81                 |
+| Terraform Cloud      | Free (< 500 resources) |
+| **Total Wave 1**     | **~€7.96**             |
+| **Total Wave 1+2**   | **~€33.96**            |
 
 ## What's Next (Wave 2)
 
