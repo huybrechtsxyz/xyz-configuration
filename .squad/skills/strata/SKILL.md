@@ -10,7 +10,7 @@ This file captures what the team has learned about strata's actual behavior — 
 
 ## Known Facts
 
-- **Binary location:** `e:\UserData\VHUYBREC\AppData\Roaming\uv\tools\xyz-strata\Scripts\strata.exe`
+- **Binary location:** `C:\Users\VHUYBREC\.local\bin\strata.exe`
 - **`strata` is NOT on PATH** — must use full path or set an alias. Run `uv tool update-shell` to fix permanently.
 - **Install command:** `uv tool install e:\SourcesXYZ\strata`
 - **Supported kinds:** `configuration`, `deployment`, `environment`, `firewall`, `module`, `namespace`, `platform_model`, `provider`, `resource`, `workspace`

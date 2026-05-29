@@ -26,7 +26,7 @@
 
 Strata is the IaC orchestration CLI for this repo. Always use it to scaffold and validate files.
 
-**Binary:** `e:\UserData\VHUYBREC\AppData\Roaming\uv\tools\xyz-strata\Scripts\strata.exe`  
+**Binary:** `C:\Users\VHUYBREC\.local\bin\strata.exe`  
 (`strata` is not on PATH — use the full path or alias `$s` in scripts)
 
 **Source:** `e:\SourcesXYZ\strata` (Python package, install with `uv tool install e:\SourcesXYZ\strata`)

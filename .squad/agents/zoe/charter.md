@@ -33,12 +33,12 @@ Haven is the **first project where strata is used in production**. When strata b
 
 ## Strata
 
-**Binary:** `e:\UserData\VHUYBREC\AppData\Roaming\uv\tools\xyz-strata\Scripts\strata.exe`  
+**Binary:** `C:\Users\VHUYBREC\.local\bin\strata.exe`  
 (`strata` is not on PATH — use the full path or alias `$s` in scripts)
 
 **Validate all stack files:**
 ```powershell
-$s = "e:\UserData\VHUYBREC\AppData\Roaming\uv\tools\xyz-strata\Scripts\strata.exe"
+$s = "C:\Users\VHUYBREC\.local\bin\strata.exe"
 Get-ChildItem e:\SourcesXYZ\haven\stack\*.yaml | ForEach-Object { & $s validate $_.FullName }
 ```
 
